@@ -8,7 +8,7 @@ const userSchema = new Schema({
 })
 
 //static signup method
-userSchema.statics.signup = async function(email, password) {
+userSchema.statics.signup = async function (email, password) {
 
     //validator
 
@@ -24,7 +24,7 @@ userSchema.statics.signup = async function(email, password) {
         throw Error('Password nit strong enough')
     }
 
-    const exists = await this.findOne({email})
+    const exists = await this.findOne({ email })
 
     if (exists) {
         throw new Error('email already used')
@@ -37,6 +37,28 @@ userSchema.statics.signup = async function(email, password) {
 
     return user
 
+}
+
+//static login method
+
+userSchema.statics.login = async function (email, password) {
+    if (!email || !password) {
+        throw Error('Must be fielded')
+    }
+
+    const user = await this.findOne({ email })
+
+    if (!user) {
+        throw new Error('Incorrect email')
+    }
+
+    const match = await bcrypt.compare(password, user.password)
+
+    if (!match) {
+        throw Error('Incorrect password')
+    }
+
+    return user
 }
 
 export default model('User', userSchema)
